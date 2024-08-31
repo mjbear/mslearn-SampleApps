@@ -64,7 +64,7 @@ namespace ParallelAsyncExample
 
             Task<int>[] downloadTasks = downloadTasksQuery.ToArray();
 
-            int[] lengths = Task.WhenAll(downloadTasks);
+            int[] lengths = await Task.WhenAll(downloadTasks);
             int total = lengths.Sum();
 
             await Dispatcher.BeginInvoke(() =>
@@ -78,10 +78,22 @@ namespace ParallelAsyncExample
 
         private async Task<int> ProcessUrlAsync(string url, HttpClient client)
         {
+            try
+            {
             byte[] byteArray = await client.GetByteArrayAsync(url);
             await DisplayResultsAsync(url, byteArray);
 
             return byteArray.Length;
+            }
+            catch (Exception ex)
+            {
+            await Dispatcher.BeginInvoke(() =>
+            {
+                _resultsTextBox.Text += $"\nError downloading {url}: {ex.Message}\n";
+            });
+
+            return 0;
+            }
         }
 
         private Task DisplayResultsAsync(string url, byte[] content) =>
