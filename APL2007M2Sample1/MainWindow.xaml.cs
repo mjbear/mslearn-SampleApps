@@ -36,6 +36,12 @@ namespace ParallelAsyncExample
             "https://docs.microsoft.com/gaming"
         };
 
+        /// <summary>
+        /// Event handler for the Start button click event.
+        /// Disables the Start button, clears the results text box, and starts the asynchronous task to calculate the sum of page sizes.
+        /// </summary>
+        /// <param name="sender">The object that raised the event.</param>
+        /// <param name="e">The event arguments.</param>
         private void OnStartButtonClick(object sender, RoutedEventArgs e)
         {
             _startButton.IsEnabled = false;
