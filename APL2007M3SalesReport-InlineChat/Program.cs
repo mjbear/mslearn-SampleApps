@@ -62,24 +62,22 @@ namespace ReportGenerator
             for (int i = 0; i < 1000; i++)
             {
                 salesData[i].dateSold = new DateOnly(2023, random.Next(1, 13), random.Next(1, 29));
-                salesData[i].departmentName = ProdDepartments.DepartmentNames[random.Next(0, ProdDepartments.DepartmentNames.Length)];
+                salesData[i].departmentName = ProdDepartments.departmentNames[random.Next(0, ProdDepartments.departmentNames.Length)];
 
-                int indexOfDept = Array.IndexOf(ProdDepartments.DepartmentNames, salesData[i].departmentName);
-                string deptAbb = ProdDepartments.DepartmentAbbreviations[indexOfDept];
+                int indexOfDept = Array.IndexOf(ProdDepartments.departmentNames, salesData[i].departmentName);
+                string deptAbb = ProdDepartments.departmentAbbreviations[indexOfDept];
                 string firstDigit = (indexOfDept + 1).ToString();
                 string nextTwoDigits = random.Next(1, 100).ToString("D2");
-                sizeCode = new string[] { "XS", "S", "M", "L", "XL" }[random.Next(0, 5)];
-                string[] colorCodes = { "BK", "BL", "GR", "RD", "YL", "OR", "WT", "GY" };
-                string colorCode = colorCodes[random.Next(0, colorCodes.Length)];
-                string[] manufacturingSites = ManufacturingSites.manSites;
-                int randomIndex = random.Next(0, manufacturingSites.Length);
-                string manufacturingSite = manufacturingSites[randomIndex];
+                string sizeCode = new string[] { "XS", "S", "M", "L", "XL" }[random.Next(0, 5)];
+                string colorCode = new string[] { "BK", "BL", "GR", "RD", "YL", "OR", "WT", "GY" }[random.Next(0, 8)];
+                string manufacturingSite = ManufacturingSites.manufacturingSites[random.Next(0, ManufacturingSites.manufacturingSites.Length)];
 
                 salesData[i].productID = $"{deptAbb}-{firstDigit}{nextTwoDigits}-{sizeCode}-{colorCode}-{manufacturingSite}";
                 salesData[i].quantitySold = random.Next(1, 101);
                 salesData[i].unitPrice = random.Next(25, 300) + random.NextDouble();
                 salesData[i].baseCost = salesData[i].unitPrice * (1 - (random.Next(5, 21) / 100.0));
                 salesData[i].volumeDiscount = (int)(salesData[i].quantitySold * 0.1);
+
             }
 
             return salesData;
