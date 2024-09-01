@@ -1,5 +1,3 @@
-This folder contains sample apps that are used in the APL2007 training. Many of the exercise units use these sample apps as the starting point for coding projects.
-
 # APL2007 Sample Applications
 
 This repository contains a collection of sample applications used in the APL2007 training. These sample apps serve as the starting point for various coding projects and exercises throughout the training modules.
