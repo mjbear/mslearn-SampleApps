@@ -154,15 +154,23 @@
                 Console.WriteLine("By Department:");
                 var sortedQuarterlySalesByDepartment = quarterlySalesByDepartment[quarter.Key].OrderBy(d => d.Key);
 
+                // Print the table headers
+                Console.WriteLine("┌─────────────────────┬─────────────┬─────────────┬──────────────────┐");
+                Console.WriteLine("│    Department       │    Sales    │    Profit   │ Profit Percentage│");
+                Console.WriteLine("├─────────────────────┼─────────────┼─────────────┼──────────────────┤");
+
                 foreach (KeyValuePair<string, double> department in sortedQuarterlySalesByDepartment)
                 {
                     string formattedDepartmentSalesAmount = department.Value.ToString("C");
                     string formattedDepartmentProfitAmount = quarterlyProfitByDepartment[quarter.Key][department.Key].ToString("C");
                     string formattedDepartmentProfitPercentage = quarterlyProfitPercentageByDepartment[quarter.Key][department.Key].ToString("F2");
 
-                    Console.WriteLine("Department: {0}, Sales: {1}, Profit: {2}, Profit Percentage: {3}%", department.Key, formattedDepartmentSalesAmount, formattedDepartmentProfitAmount, formattedDepartmentProfitPercentage);
+                    // Print the table rows
+                    Console.WriteLine($"│ {department.Key,-19} │ {formattedDepartmentSalesAmount,-11} │ {formattedDepartmentProfitAmount,-11} │ {formattedDepartmentProfitPercentage,16} │");
                 }
 
+                // Print the table footer
+                Console.WriteLine("└─────────────────────┴─────────────┴─────────────┴──────────────────┘");
                 Console.WriteLine();
             }
         }
