@@ -98,52 +98,52 @@
             // calculate the total sales, profit, and profit percentage by department
             if (!quarterlySalesByDepartment.ContainsKey(quarter))
             {
-            quarterlySalesByDepartment.Add(quarter, new Dictionary<string, double>());
-            quarterlyProfitByDepartment.Add(quarter, new Dictionary<string, double>());
-            quarterlyProfitPercentageByDepartment.Add(quarter, new Dictionary<string, double>());
+                quarterlySalesByDepartment.Add(quarter, new Dictionary<string, double>());
+                quarterlyProfitByDepartment.Add(quarter, new Dictionary<string, double>());
+                quarterlyProfitPercentageByDepartment.Add(quarter, new Dictionary<string, double>());
             }
 
             if (quarterlySalesByDepartment[quarter].ContainsKey(data.departmentName))
             {
-            quarterlySalesByDepartment[quarter][data.departmentName] += totalSales;
-            quarterlyProfitByDepartment[quarter][data.departmentName] += profit;
+                quarterlySalesByDepartment[quarter][data.departmentName] += totalSales;
+                quarterlyProfitByDepartment[quarter][data.departmentName] += profit;
             }
             else
             {
-            quarterlySalesByDepartment[quarter].Add(data.departmentName, totalSales);
-            quarterlyProfitByDepartment[quarter].Add(data.departmentName, profit);
+                quarterlySalesByDepartment[quarter].Add(data.departmentName, totalSales);
+                quarterlyProfitByDepartment[quarter].Add(data.departmentName, profit);
             }
 
             if (!quarterlyProfitPercentageByDepartment[quarter].ContainsKey(data.departmentName))
             {
-            quarterlyProfitPercentageByDepartment[quarter].Add(data.departmentName, profitPercentage);
+                quarterlyProfitPercentageByDepartment[quarter].Add(data.departmentName, profitPercentage);
             }
 
             // calculate the total sales and profit for each quarter
             if (quarterlySales.ContainsKey(quarter))
             {
-            quarterlySales[quarter] += totalSales;
-            quarterlyProfit[quarter] += profit;
+                quarterlySales[quarter] += totalSales;
+                quarterlyProfit[quarter] += profit;
             }
             else
             {
-            quarterlySales.Add(quarter, totalSales);
-            quarterlyProfit.Add(quarter, profit);
+                quarterlySales.Add(quarter, totalSales);
+                quarterlyProfit.Add(quarter, profit);
             }
 
             if (!quarterlyProfitPercentage.ContainsKey(quarter))
             {
-            quarterlyProfitPercentage.Add(quarter, profitPercentage);
+                quarterlyProfitPercentage.Add(quarter, profitPercentage);
             }
 
             // store the sales data for top 3 sales per quarter
             if (!topThreeSalesByQuarter.ContainsKey(quarter))
             {
-            topThreeSalesByQuarter.Add(quarter, new List<SalesData>());
+                topThreeSalesByQuarter.Add(quarter, new List<SalesData>());
             }
 
             topThreeSalesByQuarter[quarter].Add(data);
-            topThreeSalesByQuarter[quarter] = topThreeSalesByQuarter[quarter].OrderByDescending(s => s.quantitySold * s.unitPrice).Take(3).ToList();
+            topThreeSalesByQuarter[quarter] = topThreeSalesByQuarter[quarter].OrderByDescending(s => (s.quantitySold * s.unitPrice) - (s.quantitySold * s.baseCost)).Take(3).ToList();
             }
 
             // display the quarterly sales report
@@ -173,12 +173,12 @@
 
             foreach (KeyValuePair<string, double> department in sortedQuarterlySalesByDepartment)
             {
-            string formattedDepartmentSalesAmount = department.Value.ToString("C");
-            string formattedDepartmentProfitAmount = quarterlyProfitByDepartment[quarter.Key][department.Key].ToString("C");
-            string formattedDepartmentProfitPercentage = quarterlyProfitPercentageByDepartment[quarter.Key][department.Key].ToString("F2");
+                string formattedDepartmentSalesAmount = department.Value.ToString("C");
+                string formattedDepartmentProfitAmount = quarterlyProfitByDepartment[quarter.Key][department.Key].ToString("C");
+                string formattedDepartmentProfitPercentage = quarterlyProfitPercentageByDepartment[quarter.Key][department.Key].ToString("F2");
 
-            // Print the table rows
-            Console.WriteLine($"│ {department.Key,-19} │ {formattedDepartmentSalesAmount,-11} │ {formattedDepartmentProfitAmount,-11} │ {formattedDepartmentProfitPercentage,16} │");
+                // Print the table rows
+                Console.WriteLine($"│ {department.Key,-19} │ {formattedDepartmentSalesAmount,-11} │ {formattedDepartmentProfitAmount,-11} │ {formattedDepartmentProfitPercentage,16} │");
             }
 
             // Print the table footer
@@ -196,15 +196,15 @@
 
             foreach (SalesData sales in topThreeSales)
             {
-            string formattedTotalSales = (sales.quantitySold * sales.unitPrice).ToString("C");
-            string formattedProfit = ((sales.quantitySold * sales.unitPrice) - (sales.quantitySold * sales.baseCost)).ToString("C");
-            string profitPercentageFormatted = (((sales.quantitySold * sales.unitPrice) - (sales.quantitySold * sales.baseCost)) / (sales.quantitySold * sales.unitPrice) * 100).ToString("F2");
+                string formattedTotalSales = (sales.quantitySold * sales.unitPrice).ToString("C");
+                string formattedProfit = ((sales.quantitySold * sales.unitPrice) - (sales.quantitySold * sales.baseCost)).ToString("C");
+                string profitPercentageFormatted = (((sales.quantitySold * sales.unitPrice) - (sales.quantitySold * sales.baseCost)) / (sales.quantitySold * sales.unitPrice) * 100).ToString("F2");
 
-            // Round the unit price to two decimal places
-            string formattedUnitPrice = sales.unitPrice.ToString("C");
+                // Round the unit price to two decimal places
+                string formattedUnitPrice = sales.unitPrice.ToString("C");
 
-            // Print the table rows
-            Console.WriteLine($"│ {sales.productID,-19} │ {sales.quantitySold,14} │ {formattedUnitPrice,13} │ {formattedTotalSales,13} │ {formattedProfit,11} │ {formattedProfitPercentage,16} │");
+                // Print the table rows
+                Console.WriteLine($"│ {sales.productID,-19} │ {sales.quantitySold,14} │ {formattedUnitPrice,13} │ {formattedTotalSales,13} │ {formattedProfit,11} │ {formattedProfitPercentage,16} │");
             }
 
             // Print the table footer
