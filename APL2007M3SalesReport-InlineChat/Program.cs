@@ -40,17 +40,17 @@ namespace ReportGenerator
             /// <summary>
             /// Gets the names of the departments.
             /// </summary>
-            public static string[] DepartmentNames = { "Menswear", "Womenswear", "Childrenswear", "Footwear", "Accessories", "Sportswear", "Outerwear", "Intimates" };
+            public static string[] departmentNames = { "Menswear", "Womenswear", "Childrenswear", "Footwear", "Accessories", "Sportswear", "Outerwear", "Intimates" };
 
             /// <summary>
             /// Gets the abbreviations of the departments.
             /// </summary>
-            public static string[] DepartmentAbbreviations = { "MENS", "WMNS", "CHLD", "FOOT", "ACCS", "SPORT", "OUTR", "INTM" };
+            public static string[] departmentAbbreviations = { "MENS", "WMNS", "CHLD", "FOOT", "ACCS", "SPORT", "OUTR", "INTM" };
         }
 
         public struct ManufacturingSites
         {
-            public static string[] manSites = { "US1", "US2", "UK1", "UK2", "FR1", "FR2", "DE1", "DE2", "JP1", "JP2" };
+            public static string[] manufacturingSites = { "US1", "US2", "UK1", "UK2", "FR1", "FR2", "DE1", "DE2", "JP1", "JP2" };
         }
 
         /* the GenerateSalesData method returns 1000 SalesData records. It assigns random values to each field of the data structure */
