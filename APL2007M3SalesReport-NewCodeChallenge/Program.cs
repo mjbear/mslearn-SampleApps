@@ -69,7 +69,6 @@
             return salesData;
         }
 
-
         public void QuarterlySalesReport(SalesData[] salesData)
         {
             // create a dictionary to store the quarterly sales data
@@ -167,9 +166,9 @@
             var sortedQuarterlySalesByDepartment = quarterlySalesByDepartment[quarter.Key].OrderBy(d => d.Key);
 
             // Print the table headers
-            Console.WriteLine("┌─────────────────────┬─────────────┬─────────────┬──────────────────┐");
-            Console.WriteLine("│    Department       │    Sales    │    Profit   │ Profit Percentage│");
-            Console.WriteLine("├─────────────────────┼─────────────┼─────────────┼──────────────────┤");
+            Console.WriteLine("┌────────────────────────┬──────────────────────┬──────────────────────┬──────────────────────┐");
+            Console.WriteLine("│       Department       │       Sales          │      Profit          │ Profit Percentage    │");
+            Console.WriteLine("├────────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤");
 
             foreach (KeyValuePair<string, double> department in sortedQuarterlySalesByDepartment)
             {
@@ -178,11 +177,11 @@
                 string formattedDepartmentProfitPercentage = quarterlyProfitPercentageByDepartment[quarter.Key][department.Key].ToString("F2");
 
                 // Print the table rows
-                Console.WriteLine($"│ {department.Key,-19} │ {formattedDepartmentSalesAmount,-11} │ {formattedDepartmentProfitAmount,-11} │ {formattedDepartmentProfitPercentage,16} │");
+                Console.WriteLine($"│ {department.Key,-22} │ {formattedDepartmentSalesAmount,20} │ {formattedDepartmentProfitAmount,20} │ {formattedDepartmentProfitPercentage,20} │");
             }
 
             // Print the table footer
-            Console.WriteLine("└─────────────────────┴─────────────┴─────────────┴──────────────────┘");
+            Console.WriteLine("└────────────────────────┴──────────────────────┴──────────────────────┴──────────────────────┘");
             Console.WriteLine();
 
             // display the top 3 sales per quarter
@@ -190,9 +189,9 @@
             var topThreeSales = topThreeSalesByQuarter[quarter.Key];
 
             // Print the table headers
-            Console.WriteLine("┌─────────────────────┬────────────────┬───────────────┬───────────────┬─────────────┬──────────────────┐");
-            Console.WriteLine("│    Product ID       │ Quantity Sold  │  Unit Price   │  Total Sales  │    Profit   │ Profit Percentage│");
-            Console.WriteLine("├─────────────────────┼────────────────┼───────────────┼───────────────┼─────────────┼──────────────────┤");
+            Console.WriteLine("┌────────────────────────┬──────────────────────┬──────────────────────┬──────────────────────┬──────────────────────┬──────────────────────┐");
+            Console.WriteLine("│      Product ID        │ Quantity Sold        │  Unit Price          │  Total Sales         │    Profit            │ Profit Percentage    │");
+            Console.WriteLine("├────────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┼──────────────────────┤");
 
             foreach (SalesData sales in topThreeSales)
             {
@@ -204,11 +203,11 @@
                 string formattedUnitPrice = sales.unitPrice.ToString("C");
 
                 // Print the table rows
-                Console.WriteLine($"│ {sales.productID,-19} │ {sales.quantitySold,14} │ {formattedUnitPrice,13} │ {formattedTotalSales,13} │ {formattedProfit,11} │ {formattedProfitPercentage,16} │");
+                Console.WriteLine($"│ {sales.productID,-22} │ {sales.quantitySold,20} │ {formattedUnitPrice,20} │ {formattedTotalSales,20} │ {formattedProfit,20} │ {formattedProfitPercentage,20} │");
             }
 
             // Print the table footer
-            Console.WriteLine("└─────────────────────┴────────────────┴───────────────┴───────────────┴─────────────┴──────────────────┘");
+            Console.WriteLine("└────────────────────────┴──────────────────────┴──────────────────────┴──────────────────────┴──────────────────────┴──────────────────────┘");
             Console.WriteLine();
             }
         }
