@@ -39,6 +39,21 @@
             public static string[] manufacturingSites = { "US1", "US2", "US3", "UK1", "UK2", "UK3", "JP1", "JP2", "JP3", "CA1" };
         }
 
+        public string ConstructProductId(SalesData salesData)
+        {
+            Random random = new Random(); // Declare and initialize the 'random' variable
+
+            int indexOfDept = Array.IndexOf(ProdDepartments.departmentNames, salesData.departmentName);
+            string deptAbb = ProdDepartments.departmentAbbreviations[indexOfDept];
+            string firstDigit = (Array.IndexOf(ProdDepartments.departmentNames, salesData.departmentName) + 1).ToString();
+            string nextTwoDigits = random.Next(1, 100).ToString("D2");
+            string sizeCode = new string[] { "XS", "S", "M", "L", "XL" }[random.Next(0, 5)];
+            string colorCode = new string[] { "BK", "BL", "GR", "RD", "YL", "OR", "WT", "GY" }[random.Next(0, 8)];
+            string manufacturingSite = ManufacturingSites.manufacturingSites[random.Next(0, 10)];
+        
+            return $"{deptAbb}-{firstDigit}{nextTwoDigits}-{sizeCode}-{colorCode}-{manufacturingSite}";
+        }
+
         /* the GenerateSalesData method returns 1000 SalesData records. It assigns random values to each field of the data structure */
         public SalesData[] GenerateSalesData()
         {
@@ -50,20 +65,11 @@
                 salesData[i].dateSold = new DateOnly(2023, random.Next(1, 13), random.Next(1, 29));
                 salesData[i].departmentName = ProdDepartments.departmentNames[random.Next(0, ProdDepartments.departmentNames.Length)];
 
-                int indexOfDept = Array.IndexOf(ProdDepartments.departmentNames, salesData[i].departmentName);
-                string deptAbb = ProdDepartments.departmentAbbreviations[indexOfDept];
-                string firstDigit = (indexOfDept + 1).ToString();
-                string nextTwoDigits = random.Next(1, 100).ToString("D2");
-                string sizeCode = new string[] { "XS", "S", "M", "L", "XL" }[random.Next(0, 5)];
-                string colorCode = new string[] { "BK", "BL", "GR", "RD", "YL", "OR", "WT", "GY" }[random.Next(0, 8)];
-                string manufacturingSite = ManufacturingSites.manufacturingSites[random.Next(0, ManufacturingSites.manufacturingSites.Length)];
-
-                salesData[i].productID = $"{deptAbb}-{firstDigit}{nextTwoDigits}-{sizeCode}-{colorCode}-{manufacturingSite}";
+                salesData[i].productID = ConstructProductId(salesData[i]);
                 salesData[i].quantitySold = random.Next(1, 101);
                 salesData[i].unitPrice = random.Next(25, 300) + random.NextDouble();
                 salesData[i].baseCost = salesData[i].unitPrice * (1 - (random.Next(5, 21) / 100.0));
                 salesData[i].volumeDiscount = (int)(salesData[i].quantitySold * 0.1);
-
             }
 
             return salesData;
