@@ -87,30 +87,90 @@ namespace ReportGenerator
         {
             // create a dictionary to store the quarterly sales data
             Dictionary<string, double> quarterlySales = new Dictionary<string, double>();
+            Dictionary<string, double> quarterlyProfit = new Dictionary<string, double>();
+            Dictionary<string, double> quarterlyProfitPercentage = new Dictionary<string, double>();
+
+            // create a dictionary to store the quarterly sales data by department
+            Dictionary<string, Dictionary<string, double>> departmentQuarterlySales = new Dictionary<string, Dictionary<string, double>>();
+            Dictionary<string, Dictionary<string, double>> departmentQuarterlyProfit = new Dictionary<string, Dictionary<string, double>>();
+            Dictionary<string, Dictionary<string, double>> departmentQuarterlyProfitPercentage = new Dictionary<string, Dictionary<string, double>>();
 
             // iterate through the sales data
             foreach (SalesData data in salesData)
             {
-                // calculate the total sales for each quarter
-                string quarter = GetQuarter(data.dateSold.Month);
-                double totalSales = data.quantitySold * data.unitPrice;
+            // calculate the total sales for each quarter
+            string quarter = GetQuarter(data.dateSold.Month);
+            double totalSales = data.quantitySold * data.unitPrice;
+            double totalCost = data.quantitySold * data.baseCost;
+            double profit = totalSales - totalCost;
+            double profitPercentage = (profit / totalSales) * 100;
 
-                if (quarterlySales.ContainsKey(quarter))
+            // calculate the total sales, profit, and profit percentage by department
+            if (departmentQuarterlySales.ContainsKey(data.departmentName))
+            {
+                if (departmentQuarterlySales[data.departmentName].ContainsKey(quarter))
                 {
-                    quarterlySales[quarter] += totalSales;
+                departmentQuarterlySales[data.departmentName][quarter] += totalSales;
+                departmentQuarterlyProfit[data.departmentName][quarter] += profit;
                 }
                 else
                 {
-                    quarterlySales.Add(quarter, totalSales);
+                departmentQuarterlySales[data.departmentName].Add(quarter, totalSales);
+                departmentQuarterlyProfit[data.departmentName].Add(quarter, profit);
                 }
             }
-
-            // display the quarterly sales report
-            Console.WriteLine("Quarterly Sales Report");
-            Console.WriteLine("----------------------");
-            foreach (KeyValuePair<string, double> quarter in quarterlySales)
+            else
             {
-                Console.WriteLine("{0}: ${1}", quarter.Key, quarter.Value);
+                departmentQuarterlySales.Add(data.departmentName, new Dictionary<string, double> { { quarter, totalSales } });
+                departmentQuarterlyProfit.Add(data.departmentName, new Dictionary<string, double> { { quarter, profit } });
+            }
+
+            if (!departmentQuarterlyProfitPercentage.ContainsKey(data.departmentName))
+            {
+                departmentQuarterlyProfitPercentage.Add(data.departmentName, new Dictionary<string, double> { { quarter, profitPercentage } });
+            }
+            else if (!departmentQuarterlyProfitPercentage[data.departmentName].ContainsKey(quarter))
+            {
+                departmentQuarterlyProfitPercentage[data.departmentName].Add(quarter, profitPercentage);
+            }
+
+            // calculate the total sales, profit, and profit percentage for all departments
+            if (quarterlySales.ContainsKey(quarter))
+            {
+                quarterlySales[quarter] += totalSales;
+                quarterlyProfit[quarter] += profit;
+            }
+            else
+            {
+                quarterlySales.Add(quarter, totalSales);
+                quarterlyProfit.Add(quarter, profit);
+            }
+
+            if (!quarterlyProfitPercentage.ContainsKey(quarter))
+            {
+                quarterlyProfitPercentage.Add(quarter, profitPercentage);
+            }
+            }
+
+            // display the quarterly sales report by department
+            Console.WriteLine("Quarterly Sales Report by Department");
+            Console.WriteLine("------------------------------------");
+            foreach (KeyValuePair<string, Dictionary<string, double>> department in departmentQuarterlySales.OrderBy(d => d.Key))
+            {
+            Console.WriteLine("Department: {0}", department.Key);
+            foreach (KeyValuePair<string, double> quarter in department.Value.OrderBy(q => q.Key))
+            {
+                Console.WriteLine("{0}: Sales - {1}, Profit - {2}, Profit Percentage - {3}%", quarter.Key, quarter.Value.ToString("C"), departmentQuarterlyProfit[department.Key][quarter.Key].ToString("C"), departmentQuarterlyProfitPercentage[department.Key][quarter.Key].ToString("F2"));
+            }
+            Console.WriteLine();
+            }
+
+            // display the overall quarterly sales report
+            Console.WriteLine("Overall Quarterly Sales Report");
+            Console.WriteLine("------------------------------");
+            foreach (KeyValuePair<string, double> quarter in quarterlySales.OrderBy(q => q.Key))
+            {
+            Console.WriteLine("{0}: Sales - {1}, Profit - {2}, Profit Percentage - {3}%", quarter.Key, quarter.Value.ToString("C"), quarterlyProfit[quarter.Key].ToString("C"), quarterlyProfitPercentage[quarter.Key].ToString("F2"));
             }
         }
 
