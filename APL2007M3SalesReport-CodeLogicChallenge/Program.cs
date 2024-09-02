@@ -54,6 +54,29 @@
             return $"{deptAbb}-{firstDigit}{nextTwoDigits}-{sizeCode}-{colorCode}-{manufacturingSite}";
         }
 
+        public string[,] DeconstructProductId(string productId)
+        {
+            string[] components = productId.Split('-');
+            string[,] productComponents = new string[5, 2];
+
+            productComponents[0, 0] = "Department Abbreviation";
+            productComponents[0, 1] = components[0];
+
+            productComponents[1, 0] = "First Digit";
+            productComponents[1, 1] = components[1].Substring(0, 1);
+
+            productComponents[2, 0] = "Next Two Digits";
+            productComponents[2, 1] = components[1].Substring(1, 2);
+
+            productComponents[3, 0] = "Size Code";
+            productComponents[3, 1] = components[2];
+
+            productComponents[4, 0] = "Color Code";
+            productComponents[4, 1] = components[3];
+
+            return productComponents;
+        }
+
         /* the GenerateSalesData method returns 1000 SalesData records. It assigns random values to each field of the data structure */
         public SalesData[] GenerateSalesData()
         {
