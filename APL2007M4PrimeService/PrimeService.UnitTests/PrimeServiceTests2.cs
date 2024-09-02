@@ -1,17 +1,23 @@
-using Xunit;
-
+// using Xunit;
 namespace System.Numbers.Tests
 {
     public class PrimeServiceTests
     {
+        private readonly PrimeService _primeService;
+
+        public PrimeServiceTests()
+        {
+            _primeService = new PrimeService();
+        }
+
         [Fact]
         public void IsPrime_ReturnsFalse_ForNegativeNumbers()
         {
             // Arrange
-            var primeService = new PrimeService();
+            int candidate = -5;
 
             // Act
-            var result = primeService.IsPrime(-1);
+            bool result = _primeService.IsPrime(candidate);
 
             // Assert
             Assert.False(result);
@@ -21,10 +27,10 @@ namespace System.Numbers.Tests
         public void IsPrime_ReturnsFalse_ForZero()
         {
             // Arrange
-            var primeService = new PrimeService();
+            int candidate = 0;
 
             // Act
-            var result = primeService.IsPrime(0);
+            bool result = _primeService.IsPrime(candidate);
 
             // Assert
             Assert.False(result);
@@ -34,10 +40,10 @@ namespace System.Numbers.Tests
         public void IsPrime_ReturnsFalse_ForOne()
         {
             // Arrange
-            var primeService = new PrimeService();
+            int candidate = 1;
 
             // Act
-            var result = primeService.IsPrime(1);
+            bool result = _primeService.IsPrime(candidate);
 
             // Assert
             Assert.False(result);
@@ -47,10 +53,10 @@ namespace System.Numbers.Tests
         public void IsPrime_ReturnsTrue_ForPrimeNumbers()
         {
             // Arrange
-            var primeService = new PrimeService();
+            int candidate = 7;
 
             // Act
-            var result = primeService.IsPrime(7);
+            bool result = _primeService.IsPrime(candidate);
 
             // Assert
             Assert.True(result);
@@ -60,10 +66,10 @@ namespace System.Numbers.Tests
         public void IsPrime_ReturnsFalse_ForNonPrimeNumbers()
         {
             // Arrange
-            var primeService = new PrimeService();
+            int candidate = 10;
 
             // Act
-            var result = primeService.IsPrime(10);
+            bool result = _primeService.IsPrime(candidate);
 
             // Assert
             Assert.False(result);
