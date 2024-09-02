@@ -1,6 +1,19 @@
 using System;
 using System.Collections.Generic;
 
+/*
+Copilot translated/generated this code (from the Python version) and this C# code will not run, hmmm
+
+$ dotnet run
+Quarterly Sales Report
+----------------------
+Unhandled exception. System.Collections.Generic.KeyNotFoundException: The given key 'Q1' was not present in the dictionary.
+   at System.Collections.Generic.Dictionary`2.get_Item(TKey key)
+   at QuarterlyIncomeReportApp.QuarterlyIncomeReport.QuarterlySalesReport(List`1 salesData) in /workspaces/mslearn-SampleApps/APL2007M3B/Program.cs:line 161
+   at QuarterlyIncomeReportApp.QuarterlyIncomeReport.Main() in /workspaces/mslearn-SampleApps/APL2007M3B/Program.cs:line 17
+   at QuarterlyIncomeReportApp.Program.Main() in /workspaces/mslearn-SampleApps/APL2007M3B/Program.cs:line 253
+*/
+
 namespace QuarterlyIncomeReportApp
 {
     public class QuarterlyIncomeReport
@@ -44,7 +57,7 @@ namespace QuarterlyIncomeReportApp
                 string nextTwoDigits = random.Next(1, 100).ToString().PadLeft(2, '0');
                 string sizeCode = new string[] { "XS", "S", "M", "L", "XL" }[random.Next(0, 5)];
                 string colorCode = new string[] { "BK", "BL", "GR", "RD", "YL", "OR", "WT", "GY" }[random.Next(0, 8)];
-                string manufacturingSite = ManufacturingSites.ManufacturingSites[random.Next(0, ManufacturingSites.ManufacturingSites.Length)];
+                string manufacturingSite = ManufacturingSites.Sites[random.Next(0, ManufacturingSites.Sites.Length)];
                 string productId = $"{departmentAbbreviation}-{firstDigit}{nextTwoDigits}-{sizeCode}-{colorCode}-{manufacturingSite}";
                 int quantitySold = random.Next(1, 101);
                 decimal unitPrice = random.Next(25, 300) + random.Next(0, 100) / 100m;
@@ -240,7 +253,7 @@ namespace QuarterlyIncomeReportApp
 
         public static class ManufacturingSites
         {
-            public static string[] ManufacturingSites = { "US1", "US2", "US3", "UK1", "UK2", "UK3", "JP1", "JP2", "JP3", "CA1" };
+            public static string[] Sites = { "US1", "US2", "US3", "UK1", "UK2", "UK3", "JP1", "JP2", "JP3", "CA1" };
         }
     }
 
