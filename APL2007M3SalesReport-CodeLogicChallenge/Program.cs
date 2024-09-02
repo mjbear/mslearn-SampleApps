@@ -192,54 +192,83 @@
 
             foreach (KeyValuePair<string, double> quarter in sortedQuarterlySales)
             {
-            // format the sales amount as currency using regional settings
-            string formattedSalesAmount = quarter.Value.ToString("C");
-            string formattedProfitAmount = quarterlyProfit[quarter.Key].ToString("C");
-            string formattedProfitPercentage = quarterlyProfitPercentage[quarter.Key].ToString("F2");
+                // format the sales amount as currency using regional settings
+                string formattedSalesAmount = quarter.Value.ToString("C");
+                string formattedProfitAmount = quarterlyProfit[quarter.Key].ToString("C");
+                string formattedProfitPercentage = quarterlyProfitPercentage[quarter.Key].ToString("F2");
 
-            Console.WriteLine("{0}: Sales: {1}, Profit: {2}, Profit Percentage: {3}%", quarter.Key, formattedSalesAmount, formattedProfitAmount, formattedProfitPercentage);
+                Console.WriteLine("{0}: Sales: {1}, Profit: {2}, Profit Percentage: {3}%", quarter.Key, formattedSalesAmount, formattedProfitAmount, formattedProfitPercentage);
 
-            // display the quarterly sales, profit, and profit percentage by department
-            Console.WriteLine("By Department:");
-            var sortedQuarterlySalesByDepartment = quarterlySalesByDepartment[quarter.Key].OrderBy(d => d.Key);
+                // display the quarterly sales, profit, and profit percentage by department
+                Console.WriteLine("By Department:");
+                var sortedQuarterlySalesByDepartment = quarterlySalesByDepartment[quarter.Key].OrderBy(d => d.Key);
 
-            // Print table headers
-            Console.WriteLine("┌───────────────────────┬───────────────────┬───────────────────┬───────────────────┐");
-            Console.WriteLine("│      Department       │       Sales       │       Profit      │ Profit Percentage │");
-            Console.WriteLine("├───────────────────────┼───────────────────┼───────────────────┼───────────────────┤");
+                // Print table headers
+                Console.WriteLine("┌───────────────────────┬───────────────────┬───────────────────┬───────────────────┐");
+                Console.WriteLine("│      Department       │       Sales       │       Profit      │ Profit Percentage │");
+                Console.WriteLine("├───────────────────────┼───────────────────┼───────────────────┼───────────────────┤");
 
-            foreach (KeyValuePair<string, double> department in sortedQuarterlySalesByDepartment)
-            {
-                string formattedDepartmentSalesAmount = department.Value.ToString("C");
-                string formattedDepartmentProfitAmount = quarterlyProfitByDepartment[quarter.Key][department.Key].ToString("C");
-                string formattedDepartmentProfitPercentage = quarterlyProfitPercentageByDepartment[quarter.Key][department.Key].ToString("F2");
+                foreach (KeyValuePair<string, double> department in sortedQuarterlySalesByDepartment)
+                {
+                    string formattedDepartmentSalesAmount = department.Value.ToString("C");
+                    string formattedDepartmentProfitAmount = quarterlyProfitByDepartment[quarter.Key][department.Key].ToString("C");
+                    string formattedDepartmentProfitPercentage = quarterlyProfitPercentageByDepartment[quarter.Key][department.Key].ToString("F2");
 
-                Console.WriteLine("│ {0,-22}│ {1,17} │ {2,17} │ {3,17} │", department.Key, formattedDepartmentSalesAmount, formattedDepartmentProfitAmount, formattedDepartmentProfitPercentage);
-            }
+                    Console.WriteLine("│ {0,-22}│ {1,17} │ {2,17} │ {3,17} │", department.Key, formattedDepartmentSalesAmount, formattedDepartmentProfitAmount, formattedDepartmentProfitPercentage);
+                }
 
-            Console.WriteLine("└───────────────────────┴───────────────────┴───────────────────┴───────────────────┘");
-            Console.WriteLine();
+                Console.WriteLine("└───────────────────────┴───────────────────┴───────────────────┴───────────────────┘");
+                Console.WriteLine();
 
-            // display the top 3 sales orders for the quarter
-            Console.WriteLine("Top 3 Sales Orders:");
-            var top3SalesOrders = top3SalesOrdersByQuarter[quarter.Key];
+                // display the top 3 sales orders for the quarter
+                Console.WriteLine("Top 3 Sales Orders:");
+                var top3SalesOrders = top3SalesOrdersByQuarter[quarter.Key];
 
-            // Print table headers
-            Console.WriteLine("┌───────────────────────┬───────────────────┬───────────────────┬───────────────────┬───────────────────┬───────────────────┐");
-            Console.WriteLine("│      Product ID       │   Quantity Sold   │    Unit Price     │   Total Sales     │      Profit       │ Profit Percentage │");
-            Console.WriteLine("├───────────────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────┤");
+                // Print table headers
+                Console.WriteLine("┌───────────────────────┬───────────────────┬───────────────────┬───────────────────┬───────────────────┬───────────────────┐");
+                Console.WriteLine("│      Product ID       │   Quantity Sold   │    Unit Price     │   Total Sales     │      Profit       │ Profit Percentage │");
+                Console.WriteLine("├───────────────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────┤");
 
-            foreach (SalesData salesOrder in top3SalesOrders)
-            {
-                double orderTotalSales = salesOrder.quantitySold * salesOrder.unitPrice;
-                double orderProfit = orderTotalSales - (salesOrder.quantitySold * salesOrder.baseCost);
-                double orderProfitPercentage = (orderProfit / orderTotalSales) * 100;
+                foreach (SalesData salesOrder in top3SalesOrders)
+                {
+                    double orderTotalSales = salesOrder.quantitySold * salesOrder.unitPrice;
+                    double orderProfit = orderTotalSales - (salesOrder.quantitySold * salesOrder.baseCost);
+                    double orderProfitPercentage = (orderProfit / orderTotalSales) * 100;
 
-                Console.WriteLine("│ {0,-22}│ {1,17} │ {2,17} │ {3,17} │ {4,17} │ {5,17} │", salesOrder.productID, salesOrder.quantitySold, salesOrder.unitPrice.ToString("C"), orderTotalSales.ToString("C"), orderProfit.ToString("C"), orderProfitPercentage.ToString("F2"));
-            }
+                    Console.WriteLine("│ {0,-22}│ {1,17} │ {2,17} │ {3,17} │ {4,17} │ {5,17} │", salesOrder.productID, salesOrder.quantitySold, salesOrder.unitPrice.ToString("C"), orderTotalSales.ToString("C"), orderProfit.ToString("C"), orderProfitPercentage.ToString("F2"));
+                }
 
-            Console.WriteLine("└───────────────────────┴───────────────────┴───────────────────┴───────────────────┴───────────────────┴───────────────────┘");
-            Console.WriteLine();
+                Console.WriteLine("└───────────────────────┴───────────────────┴───────────────────┴───────────────────┴───────────────────┴───────────────────┘");
+                Console.WriteLine();
+                
+                // display the three most profitable products per quarter
+                Console.WriteLine("Top 3 Most Profitable Products:");
+                var sortedQuarterlyProfitByProduct = top3SalesOrdersByQuarter[quarter.Key]
+                    .GroupBy(order => DeconstructProductId(order.productID)[0, 1] + "-" + DeconstructProductId(order.productID)[1, 1] + DeconstructProductId(order.productID)[2, 1])
+                    .Select(group => new
+                    {
+                        ProductSerialNumber = group.Key + "-ss-cc-mmm",
+                        UnitsSold = group.Sum(order => order.quantitySold),
+                        TotalSales = group.Sum(order => order.quantitySold * order.unitPrice),
+                        AverageUnitCost = group.Average(order => order.baseCost),
+                        TotalProfit = group.Sum(order => (order.quantitySold * order.unitPrice) - (order.quantitySold * order.baseCost)),
+                        AverageProfitPercentage = group.Average(order => ((order.quantitySold * order.unitPrice) - (order.quantitySold * order.baseCost)) / (order.quantitySold * order.unitPrice) * 100)
+                    })
+                    .OrderByDescending(product => product.TotalProfit)
+                    .Take(3);
+
+                // Print table headers
+                Console.WriteLine("┌───────────────────────┬───────────────────┬───────────────────┬───────────────────┬───────────────────┬───────────────────┐");
+                Console.WriteLine("│ Product Serial Number │    Units Sold     │    Total Sales    │ Average Unit Cost │   Total Profit    │ Average Profit %  │");
+                Console.WriteLine("├───────────────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────┼───────────────────┤");
+
+                foreach (var product in sortedQuarterlyProfitByProduct)
+                {
+                    Console.WriteLine("│ {0,-22}│ {1,17} │ {2,17} │ {3,17} │ {4,17} │ {5,17} │", product.ProductSerialNumber, product.UnitsSold, product.TotalSales.ToString("C"), product.AverageUnitCost.ToString("C"), product.TotalProfit.ToString("C"), product.AverageProfitPercentage.ToString("F2"));
+                }
+
+                Console.WriteLine("└───────────────────────┴───────────────────┴───────────────────┴───────────────────┴───────────────────┴───────────────────┘");
+                Console.WriteLine();
             }
         }
 
