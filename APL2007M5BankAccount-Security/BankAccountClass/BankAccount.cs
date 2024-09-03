@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace BankAccountApp
 {
@@ -131,46 +133,75 @@ namespace BankAccountApp
         public AccountTypes AccountType { get; }
         public DateTime DateOpened { get; }
         private const double MaxTransferAmountForDifferentOwners = 500;
+        
+        public string Username { get; }
+        private string PasswordHash { get; }
 
-        public BankAccount(string accountNumber, double initialBalance, string accountHolderName, string accountType, DateTime dateOpened)
+        public BankAccount(string accountNumber, double initialBalance, string accountHolderName, string accountType, DateTime dateOpened, string username, string password)
         {
             if (accountNumber.Length != 10)
             {
                 throw new InvalidAccountNumberException(accountNumber);
             }
-
+        
             if (initialBalance < 0)
             {
                 throw new InvalidInitialBalanceException(initialBalance);
             }
-
+        
             if (accountHolderName.Length < 2)
             {
                 throw new InvalidAccountHolderNameException(accountHolderName);
             }
-
+        
             /* the enum will enforce the valid values
             if (accountType != "Savings" && accountType != "Checking" && accountType != "Money Market" && accountType != "Certificate of Deposit" && accountType != "Retirement")
             {
                 throw new InvalidAccountTypeException(accountType);
             }
             */     
-
+        
             if (dateOpened > DateTime.Now)
             {
                 throw new InvalidDateOpenedException(dateOpened);
             }
-
+        
             AccountNumber = accountNumber;
             Balance = initialBalance;
             AccountHolderName = accountHolderName;
             //AccountType = AccountTypes.Savings; // (AccountTypes)Enum.Parse(typeof(AccountTypes), accountType);
             AccountType = (AccountTypes)Enum.Parse(typeof(AccountTypes), accountType);
             DateOpened = dateOpened;
+            Username = username;
+            PasswordHash = HashPassword(password);
         }
 
-        public void Credit(double amount)
+        private string HashPassword(string password)
         {
+            using (var sha256 = SHA256.Create())
+            {
+                var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                var builder = new StringBuilder();
+                foreach (var b in bytes)
+                {
+                    builder.Append(b.ToString("x2"));
+                }
+                return builder.ToString();
+            }
+        }
+
+        public bool Authenticate(string username, string password)
+        {
+            return Username == username && PasswordHash == password;
+        }
+
+        public void Credit(double amount, string username, string password)
+        {
+            if (!Authenticate(username, password))
+            {
+                throw new UnauthorizedAccessException("Invalid username or password.");
+            }
+
             if (amount < 0)
             {
                 throw new InvalidCreditAmountException(amount);
@@ -179,16 +210,42 @@ namespace BankAccountApp
             Balance += amount;
         }
 
-        public void Debit(double amount)
+        public void Debit(double amount, string username, string password)
         {
+            if (!Authenticate(username, password))
+            {
+                throw new UnauthorizedAccessException("Invalid username or password.");
+            }
+        
             if (amount < 0)
             {
                 throw new InvalidDebitAmountException(amount);
             }
-
+        
             if (Balance >= amount)
             {
                 Balance -= amount;
+            }
+            else
+            {
+                throw new InsufficientFundsException(amount, Balance);
+            }
+        }
+        
+        public void Transfer(BankAccount toAccount, double amount, string username, string password)
+        {
+            if (!Authenticate(username, password))
+            {
+                throw new UnauthorizedAccessException("Invalid username or password.");
+            }
+        
+            ValidateTransferAmount(amount);
+            ValidateTransferLimitForDifferentOwners(toAccount, amount);
+        
+            if (Balance >= amount)
+            {
+                Debit(amount, username, password);
+                toAccount.Credit(amount, toAccount.Username, toAccount.PasswordHash);
             }
             else
             {
@@ -199,22 +256,6 @@ namespace BankAccountApp
         public double GetBalance()
         {
             return Balance; // Math.Round(balance, 2);
-        }
-
-        public void Transfer(BankAccount toAccount, double amount)
-        {
-            ValidateTransferAmount(amount);
-            ValidateTransferLimitForDifferentOwners(toAccount, amount);
-
-            if (Balance >= amount)
-            {
-                Debit(amount);
-                toAccount.Credit(amount);
-            }
-            else
-            {
-                throw new InsufficientFundsException(amount, Balance);
-            }
         }
 
         private void ValidateTransferAmount(double amount)

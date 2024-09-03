@@ -31,7 +31,9 @@
                     string accountType = GenerateRandomAccountType();
                     DateTime dateOpened = GenerateRandomDateOpened();
                     string accountNumber = "102000" + random.Next(1000, 9999).ToString();
-                    BankAccount account = new(accountNumber, initialBalance, accountHolderName, accountType, dateOpened);
+                    string username = GenerateAccountUsername(accountHolderName);
+                    string password = GenerateAccountPassword(accountHolderName);
+                    BankAccount account = new(accountNumber, initialBalance, accountHolderName, accountType, dateOpened, username, password);
                     accounts.Add(account);
                     createdAccounts++;
 
@@ -65,12 +67,12 @@
                     {
                         if (transactionAmount >= 0)
                         {
-                            account.Credit(transactionAmount);
+                            account.Credit(transactionAmount, "bob", "bob123");
                             Console.WriteLine($"Credit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
                         }
                         else
                         {
-                            account.Debit(-transactionAmount);
+                            account.Debit(-transactionAmount, "bob", "bob123");
                             Console.WriteLine($"Debit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
                         }
                     }
@@ -97,12 +99,12 @@
                     {
                         if (transactionAmount >= 0)
                         {
-                            account.Credit(transactionAmount);
+                            account.Credit(transactionAmount, "bob", "bob123");
                             Console.WriteLine($"Credit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
                         }
                         else
                         {
-                            account.Debit(-transactionAmount);
+                            account.Debit(-transactionAmount, "bob", "bob123");
                             Console.WriteLine($"Debit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
                         }
                     }
@@ -137,6 +139,17 @@
             string[] accountHolderNames = { "John Smith", "Maria Garcia", "Mohammed Khan", "Sophie Dubois", "Liam Johnson", "Emma Martinez", "Noah Lee", "Olivia Kim", "William Chen", "Ava Wang", "James Brown", "Isabella Nguyen", "Benjamin Wilson", "Mia Li", "Lucas Anderson", "Charlotte Liu", "Alexander Taylor", "Amelia Patel", "Daniel Garcia", "Sophia Kim" };
             var accountHolderName = accountHolderNames[random.Next(0, accountHolderNames.Length)];
             return accountHolderName;
+        }
+
+        static string GenerateAccountUsername(string accountHolderName)
+        {
+            return accountHolderName.ToLower().Replace(" ", "").ToString();
+        }
+
+        static string GenerateAccountPassword(string accountHolderName)
+        {
+            // replace this with something more secure
+            return accountHolderName.ToLower().Replace(" ", "") + "123";
         }
 
         static string GenerateRandomAccountType()
