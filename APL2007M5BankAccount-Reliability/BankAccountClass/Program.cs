@@ -1,4 +1,8 @@
-﻿namespace BankAccountApp
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace BankAccountApp
 {
     class Program
     {
@@ -11,14 +15,14 @@
         private const double minAccountStart = 200.0;
         private const double maxAccountStart = 1000.0;
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            List<BankAccount> accounts = CreateBankAccounts(NumberOfAccounts);
-            SimulateTransactions(accounts, NumberOfTransactions, minTransactionAmount, maxTransactionAmount);
-            SimulateTransfers(accounts, NumberOfTransactions, minTransactionAmount, maxTransactionAmount);
+            List<BankAccount> accounts = await CreateBankAccountsAsync(NumberOfAccounts);
+            await SimulateTransactionsAsync(accounts, NumberOfTransactions, minTransactionAmount, maxTransactionAmount);
+            await SimulateTransfersAsync(accounts, NumberOfTransactions, minTransactionAmount, maxTransactionAmount);
         }
 
-        static List<BankAccount> CreateBankAccounts(int numberOfAccounts)
+        static async Task<List<BankAccount>> CreateBankAccountsAsync(int numberOfAccounts)
         {
             List<BankAccount> accounts = new List<BankAccount>();
             int createdAccounts = 0;
@@ -34,73 +38,110 @@
                     accounts.Add(account);
                     createdAccounts++;
                 }
+                catch (ArgumentException ex)
+                {
+                    await Console.Out.WriteLineAsync($"Account creation failed due to invalid argument: {ex.Message}");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    await Console.Out.WriteLineAsync($"Account creation failed due to invalid operation: {ex.Message}");
+                }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Account creation failed: {ex.Message}");
+                    await Console.Out.WriteLineAsync($"Account creation failed due to an unexpected error: {ex.Message}");
                 }
             }
             return accounts;
         }
 
-        static void SimulateTransactions(List<BankAccount> accounts, int numberOfTransactions, double minTransactionAmount, double maxTransactionAmount)
+        static async Task SimulateTransactionsAsync(List<BankAccount> accounts, int numberOfTransactions, double minTransactionAmount, double maxTransactionAmount)
         {
+            var tasks = new List<Task>();
+
             foreach (BankAccount account in accounts)
             {
-                for (int i = 0; i < numberOfTransactions; i++)
+                tasks.Add(Task.Run(async () =>
                 {
-                    double transactionAmount = GenerateRandomDollarAmount(false, minTransactionAmount, maxTransactionAmount);
-                    try
+                    for (int i = 0; i < numberOfTransactions; i++)
                     {
-                        if (transactionAmount >= 0)
+                        double transactionAmount = GenerateRandomDollarAmount(false, minTransactionAmount, maxTransactionAmount);
+                        try
                         {
-                            account.Credit(transactionAmount);
-                            Console.WriteLine($"Credit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
+                            if (transactionAmount >= 0)
+                            {
+                                account.Credit(transactionAmount);
+                                await Console.Out.WriteLineAsync($"Credit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
+                            }
+                            else
+                            {
+                                account.Debit(-transactionAmount);
+                                await Console.Out.WriteLineAsync($"Debit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
+                            }
                         }
-                        else
+                        catch (ArgumentException ex)
                         {
-                            account.Debit(-transactionAmount);
-                            Console.WriteLine($"Debit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
+                            await Console.Out.WriteLineAsync($"Transaction failed due to invalid argument: {ex.Message}");
+                        }
+                        catch (InvalidOperationException ex)
+                        {
+                            await Console.Out.WriteLineAsync($"Transaction failed due to invalid operation: {ex.Message}");
+                        }
+                        catch (Exception ex)
+                        {
+                            await Console.Out.WriteLineAsync($"Transaction failed due to an unexpected error: {ex.Message}");
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Transaction failed: {ex.Message}");
-                    }
-                }
 
-                Console.WriteLine($"Account: {account.AccountNumber}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
+                    await Console.Out.WriteLineAsync($"Account: {account.AccountNumber}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
+                }));
             }
+
+            await Task.WhenAll(tasks);
         }
 
-        static void SimulateTransfers(List<BankAccount> accounts, int numberOfTransactions, double minTransactionAmount, double maxTransactionAmount)
+        static async Task SimulateTransfersAsync(List<BankAccount> accounts, int numberOfTransactions, double minTransactionAmount, double maxTransactionAmount)
         {
+            var tasks = new List<Task>();
+
             foreach (BankAccount account in accounts)
             {
-                for (int i = 0; i < numberOfTransactions; i++)
+                tasks.Add(Task.Run(async () =>
                 {
-                    double transactionAmount = GenerateRandomDollarAmount(false, minTransactionAmount, maxTransactionAmount);
-                    try
+                    for (int i = 0; i < numberOfTransactions; i++)
                     {
-                        if (transactionAmount >= 0)
+                        double transactionAmount = GenerateRandomDollarAmount(false, minTransactionAmount, maxTransactionAmount);
+                        try
                         {
-                            account.Credit(transactionAmount);
-                            Console.WriteLine($"Credit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
+                            if (transactionAmount >= 0)
+                            {
+                                account.Credit(transactionAmount);
+                                await Console.Out.WriteLineAsync($"Credit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
+                            }
+                            else
+                            {
+                                account.Debit(-transactionAmount);
+                                await Console.Out.WriteLineAsync($"Debit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
+                            }
                         }
-                        else
+                        catch (ArgumentException ex)
                         {
-                            account.Debit(-transactionAmount);
-                            Console.WriteLine($"Debit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
+                            await Console.Out.WriteLineAsync($"Transaction failed due to invalid argument: {ex.Message}");
+                        }
+                        catch (InvalidOperationException ex)
+                        {
+                            await Console.Out.WriteLineAsync($"Transaction failed due to invalid operation: {ex.Message}");
+                        }
+                        catch (Exception ex)
+                        {
+                            await Console.Out.WriteLineAsync($"Transaction failed due to an unexpected error: {ex.Message}");
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Transaction failed: {ex.Message}");
-                    }
-                }
 
-                Console.WriteLine($"Account: {account.AccountNumber}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
+                    await Console.Out.WriteLineAsync($"Account: {account.AccountNumber}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
+                }));
             }
 
+            await Task.WhenAll(tasks);
         }
 
         static double GenerateRandomDollarAmount(bool isAccount, double min, double max)
@@ -115,7 +156,7 @@
                 double transactionAmount = random.NextDouble() * random.Next((int)min, (int)max) + random.NextDouble();
                 return Math.Round(transactionAmount, 2);
             }
-       }
+        }
 
         static string GenerateRandomAccountHolder()
         {
