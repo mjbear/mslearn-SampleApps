@@ -135,7 +135,9 @@ namespace BankAccountApp
         private const double MaxTransferAmountForDifferentOwners = 500;
         
         public string Username { get; }
-        private string PasswordHash { get; }
+        // private string PasswordHash { get; }
+        // yes, this is insecure
+        public string PasswordHash { get; }
 
         public BankAccount(string accountNumber, double initialBalance, string accountHolderName, string accountType, DateTime dateOpened, string username, string password)
         {
@@ -197,60 +199,131 @@ namespace BankAccountApp
 
         public void Credit(double amount, string username, string password)
         {
-            if (!Authenticate(username, password))
+            try
             {
-                throw new UnauthorizedAccessException("Invalid username or password.");
-            }
+                if (!Authenticate(username, password))
+                {
+                    throw new UnauthorizedAccessException("Invalid username or password.");
+                }
 
-            if (amount < 0)
+                if (amount < 0)
+                {
+                    throw new InvalidCreditAmountException(amount);
+                }
+
+                Balance += amount;
+            }
+            catch (UnauthorizedAccessException ex)
             {
+                LogException(ex);
+                throw new UnauthorizedAccessException("Authentication failed.");
+            }
+            catch (InvalidCreditAmountException ex)
+            {
+                LogException(ex);
                 throw new InvalidCreditAmountException(amount);
             }
-
-            Balance += amount;
+            catch (Exception ex)
+            {
+                LogException(ex);
+                throw new Exception("An unexpected error occurred while crediting the account.");
+            }
         }
 
         public void Debit(double amount, string username, string password)
         {
-            if (!Authenticate(username, password))
+            try
             {
-                throw new UnauthorizedAccessException("Invalid username or password.");
+                if (!Authenticate(username, password))
+                {
+                    throw new UnauthorizedAccessException("Invalid username or password.");
+                }
+
+                if (amount < 0)
+                {
+                    throw new InvalidDebitAmountException(amount);
+                }
+
+                if (Balance >= amount)
+                {
+                    Balance -= amount;
+                }
+                else
+                {
+                    throw new InsufficientFundsException(amount, Balance);
+                }
             }
-        
-            if (amount < 0)
+            catch (UnauthorizedAccessException ex)
             {
+                LogException(ex);
+                throw new UnauthorizedAccessException("Authentication failed.");
+            }
+            catch (InvalidDebitAmountException ex)
+            {
+                LogException(ex);
                 throw new InvalidDebitAmountException(amount);
             }
-        
-            if (Balance >= amount)
+            catch (InsufficientFundsException ex)
             {
-                Balance -= amount;
-            }
-            else
-            {
+                LogException(ex);
                 throw new InsufficientFundsException(amount, Balance);
+            }
+            catch (Exception ex)
+            {
+                LogException(ex);
+                throw new Exception("An unexpected error occurred while debiting the account.");
             }
         }
         
         public void Transfer(BankAccount toAccount, double amount, string username, string password)
         {
-            if (!Authenticate(username, password))
+            try
             {
-                throw new UnauthorizedAccessException("Invalid username or password.");
+                if (!Authenticate(username, password))
+                {
+                    throw new UnauthorizedAccessException("Invalid username or password.");
+                }
+
+                ValidateTransferAmount(amount);
+                ValidateTransferLimitForDifferentOwners(toAccount, amount);
+
+                if (Balance >= amount)
+                {
+                    Debit(amount, username, password);
+                    toAccount.Credit(amount, toAccount.Username, toAccount.PasswordHash);
+                }
+                else
+                {
+                    throw new InsufficientFundsException(amount, Balance);
+                }
             }
-        
-            ValidateTransferAmount(amount);
-            ValidateTransferLimitForDifferentOwners(toAccount, amount);
-        
-            if (Balance >= amount)
+            catch (UnauthorizedAccessException ex)
             {
-                Debit(amount, username, password);
-                toAccount.Credit(amount, toAccount.Username, toAccount.PasswordHash);
+                LogException(ex);
+                throw new UnauthorizedAccessException("Authentication failed.");
             }
-            else
+            catch (InvalidTransferAmountException ex)
             {
+                LogException(ex);
+                throw new InvalidTransferAmountException(amount);
+            }
+            catch (InsufficientFundsException ex)
+            {
+                LogException(ex);
                 throw new InsufficientFundsException(amount, Balance);
             }
+            catch (Exception ex)
+            {
+                LogException(ex);
+                throw new Exception("An unexpected error occurred while transferring the amount.");
+            }
+        }
+
+        private void LogException(Exception ex)
+        {
+            // Implement your logging mechanism here
+            // For example, log to a file or a logging service
+            Console.WriteLine($"Exception: {ex.Message}");
         }
 
         public double GetBalance()

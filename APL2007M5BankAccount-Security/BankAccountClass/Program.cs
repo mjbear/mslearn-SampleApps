@@ -1,4 +1,6 @@
-﻿namespace BankAccountApp
+﻿using System.Security.Cryptography;
+
+namespace BankAccountApp
 {
     class Program
     {
@@ -67,12 +69,12 @@
                     {
                         if (transactionAmount >= 0)
                         {
-                            account.Credit(transactionAmount, "bob", "bob123");
+                            account.Credit(transactionAmount, account.Username, account.PasswordHash);
                             Console.WriteLine($"Credit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
                         }
                         else
                         {
-                            account.Debit(-transactionAmount, "bob", "bob123");
+                            account.Debit(-transactionAmount, account.Username, account.PasswordHash);
                             Console.WriteLine($"Debit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
                         }
                     }
@@ -81,13 +83,13 @@
                         Console.WriteLine($"Transaction failed: {ex.Message}");
                     }
                 }
-
+        
                 Console.WriteLine($"Account: {account.AccountNumber}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
             });
-
+        
             await Task.WhenAll(tasks);
         }
-
+        
         static async Task SimulateTransfersAsync(List<BankAccount> accounts, int numberOfTransactions, double minTransactionAmount, double maxTransactionAmount)
         {
             var tasks = accounts.Select(async account =>
@@ -99,12 +101,12 @@
                     {
                         if (transactionAmount >= 0)
                         {
-                            account.Credit(transactionAmount, "bob", "bob123");
+                            account.Credit(transactionAmount, account.Username, account.PasswordHash);
                             Console.WriteLine($"Credit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
                         }
                         else
                         {
-                            account.Debit(-transactionAmount, "bob", "bob123");
+                            account.Debit(-transactionAmount, account.Username, account.PasswordHash);
                             Console.WriteLine($"Debit: {transactionAmount}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
                         }
                     }
@@ -113,24 +115,21 @@
                         Console.WriteLine($"Transaction failed: {ex.Message}");
                     }
                 }
-
+        
                 Console.WriteLine($"Account: {account.AccountNumber}, Balance: {account.Balance.ToString("C")}, Account Holder: {account.AccountHolderName}, Account Type: {account.AccountType}");
             });
-
+        
             await Task.WhenAll(tasks);
         }
 
         static double GenerateRandomDollarAmount(bool isAccount, double min, double max)
         {
-            if (isAccount)
+            using (var rng = new RNGCryptoServiceProvider())
             {
-                double accountStartingValue = random.NextDouble() * (max - min) + min;
-                return Math.Round(accountStartingValue, 2);
-            }
-            else
-            {
-                double transactionAmount = random.NextDouble() * random.Next((int)min, (int)max) + random.NextDouble();
-                return Math.Round(transactionAmount, 2);
+                byte[] randomNumber = new byte[8];
+                rng.GetBytes(randomNumber);
+                double value = BitConverter.ToUInt64(randomNumber, 0) / (1 << 11) / (double)(1 << 53);
+                return Math.Round(min + (value * (max - min)), 2);
             }
         }
 
@@ -148,8 +147,13 @@
 
         static string GenerateAccountPassword(string accountHolderName)
         {
-            // replace this with something more secure
-            return accountHolderName.ToLower().Replace(" ", "") + "123";
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                byte[] tokenData = new byte[32];
+                rng.GetBytes(tokenData);
+
+                return Convert.ToBase64String(tokenData);
+            }
         }
 
         static string GenerateRandomAccountType()
