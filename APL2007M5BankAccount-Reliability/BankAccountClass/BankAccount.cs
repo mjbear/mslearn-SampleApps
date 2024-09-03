@@ -4,6 +4,8 @@ namespace BankAccountApp
 {
     public class BankAccount
     {
+        private readonly object balanceLock = new object();
+
         public string AccountNumber { get; }
         public double Balance { get; private set; }
         public string AccountHolderName { get; }
@@ -12,6 +14,9 @@ namespace BankAccountApp
 
         public BankAccount(string accountNumber, double initialBalance, string accountHolderName, string accountType, DateTime dateOpened)
         {
+            if (initialBalance < 0)
+                throw new ArgumentException("Initial balance cannot be negative.");
+
             AccountNumber = accountNumber;
             Balance = initialBalance;
             AccountHolderName = accountHolderName;
@@ -21,42 +26,62 @@ namespace BankAccountApp
 
         public void Credit(double amount)
         {
-            Balance += amount;
+            if (amount < 0)
+                throw new ArgumentException("Credit amount cannot be negative.");
+
+            lock (balanceLock)
+            {
+                Balance += amount;
+            }
         }
 
         public void Debit(double amount)
         {
+            if (amount < 0)
+                throw new ArgumentException("Debit amount cannot be negative.");
 
-            if (Balance >= amount)
+            lock (balanceLock)
             {
-                Balance -= amount;
+                if (Balance >= amount)
+                {
+                    Balance -= amount;
+                }
+                else
+                {
+                    throw new InsufficientBalanceException("Insufficient balance for debit.");
+                }
             }
-            else
+        }
+
+        public void Transfer(BankAccount toAccount, double amount)
+        {
+            if (amount < 0)
+                throw new ArgumentException("Transfer amount cannot be negative.");
+
+            lock (balanceLock)
             {
-                throw new Exception("Insufficient balance for debit.");
+                if (Balance >= amount)
+                {
+                    if (AccountHolderName != toAccount.AccountHolderName && amount > 500)
+                    {
+                        throw new TransferLimitExceededException("Transfer amount exceeds maximum limit for different account owners.");
+                    }
+
+                    Debit(amount);
+                    toAccount.Credit(amount);
+                }
+                else
+                {
+                    throw new InsufficientBalanceException("Insufficient balance for transfer.");
+                }
             }
         }
 
         public double GetBalance()
         {
-            return Balance; // Math.Round(balance, 2);
-        }
-
-        public void Transfer(BankAccount toAccount, double amount)
-        {
-            if (Balance >= amount)
+            lock (balanceLock)
             {
-                if (AccountHolderName != toAccount.AccountHolderName && amount > 500)
-                {
-                    throw new Exception("Transfer amount exceeds maximum limit for different account owners.");
-                }
-
-                Debit(amount);
-                toAccount.Credit(amount);
-            }
-            else
-            {
-                throw new Exception("Insufficient balance for transfer.");
+                return Balance;
             }
         }
 
@@ -68,7 +93,13 @@ namespace BankAccountApp
 
         public double CalculateInterest(double interestRate)
         {
-            return Balance * interestRate;
+            if (interestRate < 0)
+                throw new ArgumentException("Interest rate cannot be negative.");
+
+            lock (balanceLock)
+            {
+                return Balance * interestRate;
+            }
         }
     }
 }
