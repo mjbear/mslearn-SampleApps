@@ -1,5 +1,13 @@
 # Library App
 
+## Note:
+This code does throw a few exceptions which seem to be unexpected based on [the lesson conclusion notes (scroll to bottom)](https://learn.microsoft.com/en-us/training/modules/guided-project-accelerate-app-development-using-github-copilot-tools/6-exercise-refactor-improve-code-github-copilot).
+```
+Exception thrown: 'System.NullReferenceException' in Library.Console.dll
+Exception thrown: 'System.AggregateException' in System.Private.CoreLib.dll
+Exception thrown: 'System.NullReferenceException' in System.Private.CoreLib.dll
+```
+
 ## Description
 Library App is a console application designed to manage library operations such as patron searches and loan management. It is built using .NET 8.0 and follows a modular architecture with separate projects for application core, console interface, and infrastructure.
 
